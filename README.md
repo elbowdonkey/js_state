@@ -1,11 +1,10 @@
 This is a simple state machine. Using it looks something like this:
 
+```javascript
 var DummyClass = function() {};
 var dummyInstance = new DummyClass();
 
 dummyInstance.stateMachine = new StateMachine();
-
-
 
 dummyInstance.stateMachine.states = {
   StateOne: {
@@ -20,3 +19,4 @@ dummyInstance.stateMachine.states = {
 }
 
 dummyInstance.stateMachine.changeState('StateTwo');
+```
