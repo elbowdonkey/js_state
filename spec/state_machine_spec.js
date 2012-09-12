@@ -3,80 +3,69 @@ Screw.Unit(function(c) { with(c) {
   	describe("creation", function() {
 	  	var DummyClass;
 	  	var dummyInstance;
-	  	var objectForStateMachine;
+	  	var stateDefinitions;
 
 	  	before(function() {
 	      DummyClass = function() {};
 	      dummyInstance = new DummyClass();
+	      stateDefinitions = {
+	      	One: {
+	      		enter: function() {},
+	      		exit: function() {}
+	      	},
+	      	Two: {
+	      		enter: function() {},
+	      		exit: function() {}
+	      	}
+	      };
+
+	      new StateMachine(dummyInstance, stateDefinitions);
 	    });
 
 	    it("can be applied to an object", function() {
-	      expect(dummyInstance.stateMachine).to(be_undefined);
-	      dummyInstance.stateMachine = new StateMachine();
-	      expect(dummyInstance.stateMachine).to(be_an_instance_of, StateMachine);
-	    });
-	  });
-
-	  describe("use", function(){
-	  	var DummyClass;
-	  	var dummyInstance;
-	  	var objectForStateMachine;
-
-	  	before(function() {
-	      DummyClass = function() {};
-	      dummyInstance = new DummyClass();
-	      dummyInstance.stateMachine = new StateMachine();
-	      dummyInstance.stateMachine.dummyProperty = [];
-				dummyInstance.stateMachine.states = {
-					StateOne: {
-						enter: function() {
-							this.dummyProperty.push('entered StateOne');
-						},
-						exit: function() {
-							this.dummyProperty.push('exited StateOne');
-						}
-					},
-					StateTwo: {
-						enter: function() {
-							this.dummyProperty.push('entered StateTwo');
-						},
-						exit: function() {
-							this.dummyProperty.push('exited StateTwo');
-						}
-					}
-				}
+	      expect(typeof(dummyInstance.changeState) == 'function').to(be_true);
 	    });
 
-	  	it("enters states", function() {
-	      expect(dummyInstance.stateMachine.state).to(be_undefined);
-	      expect(dummyInstance.stateMachine.dummyProperty).to(equal, []);
-
-	      dummyInstance.stateMachine.changeState('StateOne');
-	      expect(dummyInstance.stateMachine.state).to(equal, 'StateOne');
-	      expect(dummyInstance.stateMachine.dummyProperty[0]).to(equal, 'entered StateOne');
+	    it("can have states", function() {
+	      expect(dummyInstance.states).to(equal, stateDefinitions);
 	    });
 
-	    it("exits states", function() {
-	      dummyInstance.stateMachine.changeState('StateOne');
-	      dummyInstance.stateMachine.changeState('StateTwo');
-	      expect(dummyInstance.stateMachine.state).to(equal, 'StateTwo');
+		  it("can change states", function() {
+		  	expect(dummyInstance.state).to(equal, undefined);
+		  	dummyInstance.changeState("One");
+		  	expect(dummyInstance.state).to(equal, "One");
+		  });
 
-	      expect(dummyInstance.stateMachine.dummyProperty[0]).to(equal, 'entered StateOne');
-	      expect(dummyInstance.stateMachine.dummyProperty[1]).to(equal, 'exited StateOne');
-	      expect(dummyInstance.stateMachine.dummyProperty[2]).to(equal, 'entered StateTwo');
-	    });
+		  it("runs enter and exit functions", function() {
+		  	dummyInstance.enterCounter = 0;
+		  	dummyInstance.exitCounter = 0;
+		    dummyInstance.states = {
+		    	One: {
+		    		enter: function() {
+		    			this.enterCounter += 1;
+		    		},
+		    		exit: function() {
+		    			this.exitCounter += 1;
+		    		}
+		    	},
+		    	Two: {
+		    		enter: function() {
+		    			this.enterCounter += 1;
+		    		},
+		    		exit: function() {
+		    			this.exitCounter += 1;
+		    		}
+		    	}
+		    }
 
-	    it("avoids transitions when remaining in the same state", function(){
-	    	dummyInstance.stateMachine.changeState('StateOne');
-	    	dummyInstance.stateMachine.changeState('StateOne');
-	    	expect(dummyInstance.stateMachine.dummyProperty.length).to(equal, 1);
-	    });
+		    dummyInstance.changeState("One");
+		    expect(dummyInstance.enterCounter).to(equal, 1);
+		    expect(dummyInstance.exitCounter).to(equal, 0);
 
-			it("isn't fooled by undefined states", function(){
-	    	dummyInstance.stateMachine.changeState('StateOne');
-	    	dummyInstance.stateMachine.changeState('TotallyNotThereState');
-	    	expect(dummyInstance.stateMachine.state).to(equal, 'StateOne');
-	    });
+		    dummyInstance.changeState("Two");
+		    expect(dummyInstance.enterCounter).to(equal, 2);
+		    expect(dummyInstance.exitCounter).to(equal, 1);
+		  });
 	  });
   });
 }});
