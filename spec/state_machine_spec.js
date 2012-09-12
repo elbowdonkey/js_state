@@ -65,6 +65,18 @@ Screw.Unit(function(c) { with(c) {
 	      expect(dummyInstance.stateMachine.dummyProperty[1]).to(equal, 'exited StateOne');
 	      expect(dummyInstance.stateMachine.dummyProperty[2]).to(equal, 'entered StateTwo');
 	    });
+
+	    it("avoids transitions when remaining in the same state", function(){
+	    	dummyInstance.stateMachine.changeState('StateOne');
+	    	dummyInstance.stateMachine.changeState('StateOne');
+	    	expect(dummyInstance.stateMachine.dummyProperty.length).to(equal, 1);
+	    });
+
+			it("isn't fooled by undefined states", function(){
+	    	dummyInstance.stateMachine.changeState('StateOne');
+	    	dummyInstance.stateMachine.changeState('TotallyNotThereState');
+	    	expect(dummyInstance.stateMachine.state).to(equal, 'StateOne');
+	    });
 	  });
   });
 }});
