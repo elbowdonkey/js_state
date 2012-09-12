@@ -51,8 +51,7 @@ StateMachine.prototype.handleEvent = function(eventName) {
       var result = event.apply(this,
       Array.prototype.slice.call(arguments, 1));
   }
-  if (typeof(this.afterEvent) != 'undefined')
-  this.afterEvent.call(this, eventName);
+  if (typeof(this.afterEvent) != 'undefined') this.afterEvent.call(this, eventName);
   return this;
 }
 
@@ -70,10 +69,10 @@ StateMachine.prototype.handleEvent = function(eventName) {
 StateMachine.prototype.changeState = function(newState, calledBy) {
   var oldState = this.state;
   this.calledBy = calledBy;
-  if ((typeof(this.beforeStateChange) != 'undefined') && (this.beforeStateChange.call(this, newState, oldState, calledBy) == false)) {
-    return false;
-  }
+  var beforePresent = typeof(this.beforeStateChange) != 'undefined';
+  var beforeResults = beforePresent && this.beforeStateChange.call(this, newState, oldState, calledBy);
 
+  if (beforePresent && beforeResults == false) return false;
   if (oldState == newState) return this;
 
   // already there, not going to change to it
@@ -101,68 +100,62 @@ StateMachine.prototype.changeState = function(newState, calledBy) {
     The name of the event (usually 'enter' or 'exit')
 
 */
-StateMachine.prototype.beforeEvent = function(eventName){}
+// StateMachine.prototype.beforeEvent = function(eventName){}
 
-/**
-  Triggered after an event is handled. See beforeEvent for more details.
+// /**
+//   Triggered after an event is handled. See beforeEvent for more details.
 
-  Maybe it'll be useful someday, but for now, it does nothing.
+//   Maybe it'll be useful someday, but for now, it does nothing.
 
-  @static
-  @function
-  @param {String} eventName
-    The name of the event (usually 'enter' or 'exit')
+//   @static
+//   @function
+//   @param {String} eventName
+//     The name of the event (usually 'enter' or 'exit')
 
-*/
-StateMachine.prototype.afterEvent = function(eventName){}
+// */
+// StateMachine.prototype.afterEvent = function(eventName){}
 
 
-/**
-  Kicks off anything defined in the enter property of a defined state in an object's state machine.
+// /**
+//   Kicks off anything defined in the enter property of a defined state in an object's state machine.
 
-  @static
-  @function
-  @param {String} to
-    The name of the event that we're changing to
-  @param {String} from
-    The name of the event that we're changing from
-  @param {String} calledBy
-    An optional description (used for logging) that can be used to let us know where changeState was called
+//   @static
+//   @function
+//   @param {String} to
+//     The name of the event that we're changing to
+//   @param {String} from
+//     The name of the event that we're changing from
+//   @param {String} calledBy
+//     An optional description (used for logging) that can be used to let us know where changeState was called
 
-*/
-StateMachine.prototype.beforeStateChange = function(to, from, calledBy){
-  if (this.debug && to != "enter" && to != "exit" && typeof(to) != 'undefined') {
-    // an undefined 'to' means we're simply in the same state we were before entering it again
-    if (from == to){
-      return false;
-    } else {
-      logger(this, from, to, calledBy);
-    }
-    return true;
-  } else {
-    return true;
-  }
-}
+// */
+// StateMachine.prototype.beforeStateChange = function(to, from, calledBy){
+//   // if (this.debug && to != "enter" && to != "exit" && typeof(to) != 'undefined') {
+//   //   // an undefined 'to' means we're simply in the same state we were before entering it again
+//   //   if (from == to) {
+//   //     return false;
+//   //   } else {
+//   //     return true;
+//   //   }
+//   // } else {
+//     this.beforeProp = true;
+//     return true;
+//   //}
+// }
 
-/**
-  Kicks off anything defined in the exit property of a defined state in an object's state machine.
+// /**
+//   Kicks off anything defined in the exit property of a defined state in an object's state machine.
 
-  @static
-  @function
-  @param {String} to
-    The name of the event that we're changing to
-  @param {String} from
-    The name of the event that we're changing from
-  @param {String} calledBy
-    An optional description (used for logging) that can be used to let us know where changeState was called
+//   @static
+//   @function
+//   @param {String} to
+//     The name of the event that we're changing to
+//   @param {String} from
+//     The name of the event that we're changing from
+//   @param {String} calledBy
+//     An optional description (used for logging) that can be used to let us know where changeState was called
 
-*/
-StateMachine.prototype.afterStateChange = function(to, from){
-  //if (this.debug && to != "enter" && to != "exit") {
-  //  var message = pad(this.name) + pad(' exiting ') + pad(from + '',25);
-  //  var ms = new Date().getNanoseconds();
-  //
-  //  console.log(ms, this, message);
-  //  this.eventLog.push(message);
-  //}
-}
+// */
+// StateMachine.prototype.afterStateChange = function(to, from, calledBy){
+//   return true;
+// }
